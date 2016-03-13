@@ -29,7 +29,7 @@ namespace RenameToGuid
 
         static void RenameFile(FileInfo file)
         {
-            file.MoveTo($"{file.Directory}/{Guid.NewGuid()}.{file.Extension}");
+            file.MoveTo($"{file.Directory}/{Guid.NewGuid()}{file.Extension}");
         }
     }
 }
