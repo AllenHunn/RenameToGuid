@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RenameToGuid
 {
@@ -11,25 +9,40 @@ namespace RenameToGuid
     {
         static void Main(string[] args)
         {
-            var path = String.Join(" ", args);
-            var directory = new DirectoryInfo(path);
-            if (directory.Exists)
+            var paths = new List<string>();
+            DirectoryInfo destination = null;
+            
+            if (args.Length > 1)
             {
-                Array.ForEach(directory.GetFiles(), RenameFile);
+                destination = new DirectoryInfo(args[0]);
+                paths = args.Skip(1).ToList();
             }
             else
             {
-                var file = new FileInfo(path);
-                if (file.Exists)
-                    RenameFile(file);
+                paths.Add(args[0]);
+            }
+
+            foreach (var path in paths)
+            {
+                var directory = new DirectoryInfo(path);
+                if (directory.Exists)
+                {
+                    Array.ForEach(directory.GetFiles(), (f) => RenameFile(f, destination ?? directory));
+                }
                 else
-                    Console.WriteLine($"File or directory {path} does not exist.");
+                {
+                    var file = new FileInfo(path);
+                    if (file.Exists)
+                        RenameFile(file, destination ?? file.Directory);
+                    else
+                        Console.WriteLine($"File or directory {path} does not exist.");
+                } 
             }
         }
 
-        static void RenameFile(FileInfo file)
+        static void RenameFile(FileInfo file, DirectoryInfo destination)
         {
-            file.MoveTo($"{file.Directory}/{Guid.NewGuid()}{file.Extension}");
+            file.MoveTo($"{destination.FullName}/{Guid.NewGuid()}{file.Extension}");
         }
     }
 }
